@@ -39,9 +39,9 @@ public class Program
 	String linger = null;
 	boolean dashed = false;
 	
-	final ArrayList<String>   vars = new ArrayList<>();
-	final ArrayList<String>  files = new ArrayList<>();
-	final HashSet<String>  fileSet = new   HashSet<>();
+	final ArrayList<String>   vars = new ArrayList<String>();
+	final ArrayList<String>  files = new ArrayList<String>();
+	final HashSet<String>  fileSet = new   HashSet<String>();
 	String oFlag = null;
 	
 	for (final String arg : args)
@@ -163,9 +163,13 @@ public class Program
      */
     public static void process(final String input, final String output, final List<String> vars) throws Throwable
     {
-	try (final Scanner in = new Scanner(new BufferedInputStream(new FileInputStream(input)), "UTF-8");
-	     final OutputStream out = new BufferedOutputStream(new FileOutputStream(output + ".sh")))
+	Scanner in = null;
+        OutputStream out = null;
+	try
 	{
+	    in = new Scanner(new BufferedInputStream(new FileInputStream(input)), "UTF-8");
+	    out = new BufferedOutputStream(new FileOutputStream(output + ".sh"));
+	    
 	    out.write("#!/usr/bin/env bash\n".getBytes("UTF-8"));
 	    out.write("function _() {\n".getBytes("UTF-8"));
 	    for (final String var : vars)
@@ -194,11 +198,27 @@ public class Program
 	    out.write(("}\npp > '" + output.replace("'", "'\\''") + "'\n").getBytes("UTF-8"));
 	    out.flush();
 	}
+	finally
+	{
+	    if (in != null)
+		try
+		{   in.close();
+		}
+		catch (final Throwable ignore)
+		    { /* ignore */ }
+	    
+	    if (out != null)
+		try
+		{   out.close();
+		}
+		catch (final Throwable ignore)
+		    { /* ignore */ }
+	}
         
 	(new File(output)).getParentFile().mkdirs();
 	
         final ProcessBuilder procBuilder = new ProcessBuilder(("bash ./" + output + ".sh").split("\0"));
-        procBuilder.inheritIO();
+        //procBuilder.inheritIO();
         final Process process = procBuilder.start();
         process.waitFor();
         if (process.exitValue() != 0)
