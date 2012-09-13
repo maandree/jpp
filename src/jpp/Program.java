@@ -145,7 +145,7 @@ public class Program
 		    ascii.append("\033[22m");
 	}       }
 	catch (final UnsupportedEncodingException err)
-	{   throw new IOError(err);
+	{   throw new Error(err); //IOError is missing in classpath
 	}
 	
 	System.err.println(ascii.toString());
