@@ -52,10 +52,12 @@ public class Program
 			System.exit(-1); return;
 		    }
 		    files.add(arg);
-		    fileSet(arg);
+		    fileSet.add(arg);
 		}
-		else if (args.equals("--"))
+		else if (arg.equals("--"))
 		    dashed = true;
+		else if (arg.startsWith("-D") && ! arg.equals("-D"))
+		    vars.add(arg.substring(2));
 		else
 		    linger = arg;
 	    else
@@ -66,6 +68,8 @@ public class Program
 		    {   err(1, "fatal", null, null, "Duplicate option: -o");
 			System.exit(-1); return;
 		    }
+		else if (linger.equals("-D") || linger.equals("--export"))
+		    vars.add(arg);
 		else
 		    err(3, "warning", null, null, "Unrecognised option: " + linger);
 		
@@ -97,7 +101,7 @@ public class Program
 		String _file = file;
 		if (_file.toLowerCase().endsWith(".jpp"))
 		    _file = _file.substring(0, _file.length() - 4) + ".java";
-		process(file, (new File(oFlag, _file)).getAbsolutePath()); /* Do *NOT* use canonical path */
+		process(file, (new File(oFlag, _file)).getAbsolutePath(), vars); /* Do *NOT* use canonical path */
 	    }
 	}
 	catch (final Throwable err)
@@ -127,7 +131,7 @@ public class Program
 	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[37m:\033[32m") + "\033[37m:")
 	                 + _description.replace(":", "\033[37m:\033[34m") + "\033[0m";
 	final StringBuilder ascii = new StringBuilder();
-	for (final byte b : usc.getBytes("UTF-8"))
+	for (final byte b : ucs.getBytes("UTF-8"))
 	    if ((((b & 128) == 0) && (' ' <= b)) || (b == '\033'))
 		ascii.append((char)b);
 	    else
@@ -154,8 +158,8 @@ public class Program
      */
     public static void process(final String input, final String output, final List<String> vars) throws Throwable
     {
-	try (final Scanner in = new Scanner(new BufferedInputStream(new FileInputStream(input))), "UTF-8");
-	     final OutputStream out = new BufferedOutputStream(new FileOutputStream(output + '.sh')))
+	try (final Scanner in = new Scanner(new BufferedInputStream(new FileInputStream(input)), "UTF-8");
+	     final OutputStream out = new BufferedOutputStream(new FileOutputStream(output + ".sh")))
 	{
 	    out.write("#!/usr/bin/env bash\n".getBytes("UTF-8"));
 	    out.write("function _() {\n".getBytes("UTF-8"));
@@ -167,16 +171,16 @@ public class Program
 		{
 		    lineIndex++;
 		    final String line = in.nextLine();
-		    if (line.starts("#") && ! line.starts("##"))
+		    if (line.startsWith("#") && ! line.startsWith("##"))
 			out.write(line.substring(1).getBytes("UTF-8"));
 		    else
 		    {
-			String data = line.starts("##") ? line.substring(1) : line;
-			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"$(").replace("\">", ")\"'"):
+			String data = line.startsWith("##") ? line.substring(1) : line;
+			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"$(").replace("\">", ")\"'");
 			data = lineIndex + " echo '" + data + '\'';
 			out.write(data.getBytes("UTF-8"));
 		    }
-		    out.write('10');
+		    out.write('\n');
 		}
 		catch (final Throwable err)
 		{   err(1, "error", null, null, err.toString());
@@ -186,7 +190,7 @@ public class Program
 	    out.flush();
 	}
         
-        final ProcessBuilder procBuilder = new ProcessBuilder(cmds);
+        final ProcessBuilder procBuilder = new ProcessBuilder(("bash ./" + output + ".sh").split("\0"));
         procBuilder.inheritIO();
         final Process process = procBuilder.start();
         process.waitFor();
