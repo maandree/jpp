@@ -195,6 +195,8 @@ public class Program
 	    out.flush();
 	}
         
+	(new File(output)).getParentFile().mkdirs();
+	
         final ProcessBuilder procBuilder = new ProcessBuilder(("bash ./" + output + ".sh").split("\0"));
         procBuilder.inheritIO();
         final Process process = procBuilder.start();
