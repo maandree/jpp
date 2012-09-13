@@ -131,18 +131,23 @@ public class Program
 	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[37m:\033[32m") + "\033[37m:")
 	                 + _description.replace(":", "\033[37m:\033[34m") + "\033[0m";
 	final StringBuilder ascii = new StringBuilder();
-	for (final byte b : ucs.getBytes("UTF-8"))
-	    if ((((b & 128) == 0) && (' ' <= b)) || (b == '\033'))
-		ascii.append((char)b);
-	    else
-	    {   byte o = b;
-		ascii.append("\033[2m\\0");
-		while (o != 0)
-		{   ascii.append((char)('0' | (o & 7)));
-		    o >>>= 3;
-		}
-		ascii.append("\033[22m");
-	    }
+	try
+	{   for (final byte b : ucs.getBytes("UTF-8"))
+		if ((((b & 128) == 0) && (' ' <= b)) || (b == '\033'))
+		    ascii.append((char)b);
+		else
+		{   byte o = b;
+		    ascii.append("\033[2m\\0");
+		    while (o != 0)
+		    {   ascii.append((char)('0' | (o & 7)));
+			o >>>= 3;
+		    }
+		    ascii.append("\033[22m");
+	}       }
+	catch (final UnsupportedEncodingException err)
+	{   throw new IOError(err);
+	}
+	
 	System.err.println(ascii.toString());
     }
     
