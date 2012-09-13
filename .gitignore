@@ -1,0 +1,16 @@
+/_/
+
+/bin/
+*.jar
+*.class
+*.pdf
+*.info
+
+*.gz
+*.xz
+
+*.swp
+*.bak
+\#*\#
+.\#*
+*~
