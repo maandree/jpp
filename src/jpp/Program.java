@@ -19,6 +19,7 @@
 package jpp;
 
 import java.util.*;
+import java.io.*;
 
 
 /**
@@ -38,8 +39,9 @@ public class Program
 	String linger = null;
 	boolean dashed = false;
 	
-	final ArrayList<String> files = new ArrayList<String>();
-	final HashSet<String> fileSet = new HashSet<String>();
+	final ArrayList<String>   vars = new ArrayList<>();
+	final ArrayList<String>  files = new ArrayList<>();
+	final HashSet<String>  fileSet = new   HashSet<>();
 	String oFlag = null;
 	
 	for (final String arg : args)
@@ -146,11 +148,52 @@ public class Program
      * 
      * @param  input   Input <tt>jpp</tt> file
      * @param  output  Output <tt>java</tt> file
+     * @param  vars    Variables
      * 
      * @throws  Throwable  In case something is wrong
      */
-    public static void process(final String input, final String output) throws Throwable
+    public static void process(final String input, final String output, final List<String> vars) throws Throwable
     {
+	try (final Scanner in = new Scanner(new BufferedInputStream(new FileInputStream(input))), "UTF-8");
+	     final OutputStream out = new BufferedOutputStream(new FileOutputStream(output + '.sh')))
+	{
+	    out.write("#!/usr/bin/env bash\n".getBytes("UTF-8"));
+	    out.write("function _() {\n".getBytes("UTF-8"));
+	    for (final String var : vars)
+		out.write((var + "\n").getBytes("UTF-8"));
+	    int lineIndex = 0;
+	    while (in.hasNextLine())
+		try
+		{
+		    lineIndex++;
+		    final String line = in.nextLine();
+		    if (line.starts("#") && ! line.starts("##"))
+			out.write(line.substring(1).getBytes("UTF-8"));
+		    else
+		    {
+			String data = line.starts("##") ? line.substring(1) : line;
+			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"$(").replace("\">", ")\"'"):
+			data = lineIndex + " echo '" + data + '\'';
+			out.write(data.getBytes("UTF-8"));
+		    }
+		    out.write('10');
+		}
+		catch (final Throwable err)
+		{   err(1, "error", null, null, err.toString());
+		    System.exit(-2); return;
+		}
+	    out.write(("}\npp > '" + output.replace("'", "'\\''") + "'\n").getBytes("UTF-8"));
+	    out.flush();
+	}
+        
+        final ProcessBuilder procBuilder = new ProcessBuilder(cmds);
+        procBuilder.inheritIO();
+        final Process process = procBuilder.start();
+        process.waitFor();
+        if (process.exitValue() != 0)
+	{   err(1, "error", input, null, "bash exited with error code: " + process.exitValue());
+	    System.exit(-3); return;
+	}
     }
     
 }
