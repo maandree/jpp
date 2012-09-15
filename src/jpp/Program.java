@@ -194,7 +194,7 @@ public class Program
 		    else
 		    {
 			String data = trim + (line.startsWith("##") ? line.substring(1) : line);
-			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"${").replace("\">", "}\"'");
+			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"$", "'\"${").replace("$\">", "}\"'");
 			data = "echo '" + lineIndex + " " + data + '\'';
 			out.write(data.getBytes("UTF-8"));
 		    }

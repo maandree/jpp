@@ -10,7 +10,7 @@ public class Simple
 	#[ ! $DEBUG = "" ] &&
 	    System.out.println("DEBUG MODE");
 	
-	System.out.println("Hello <"TEXT">!");
+	System.out.println("Hello <"$TEXT$">!");
     }
 }
 
