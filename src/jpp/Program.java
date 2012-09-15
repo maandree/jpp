@@ -101,7 +101,9 @@ public class Program
 		String _file = file;
 		if (_file.toLowerCase().endsWith(".jpp"))
 		    _file = _file.substring(0, _file.length() - 4) + ".java";
-		process(file, (new File(oFlag, _file)).getAbsolutePath(), vars); /* Do *NOT* use canonical path */
+		_file = (new File(oFlag, _file)).getAbsolutePath();
+		process(file, _file, vars); /* Do *NOT* use canonical path */
+		postprocess(_file, _file);
 	    }
 	}
 	catch (final Throwable err)
@@ -186,7 +188,7 @@ public class Program
 		    {
 			String data = line.startsWith("##") ? line.substring(1) : line;
 			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"$(").replace("\">", ")\"'");
-			data = lineIndex + " echo '" + data + '\'';
+			data = "echo '" + lineIndex + " " + data + '\'';
 			out.write(data.getBytes("UTF-8"));
 		    }
 		    out.write('\n');
@@ -224,6 +226,65 @@ public class Program
         if (process.exitValue() != 0)
 	{   err(1, "error", input, null, "bash exited with error code: " + process.exitValue());
 	    System.exit(-3); return;
+	}
+    }
+    
+    
+    /**
+     * Postprocesses a <tt>java</tt> file
+     * 
+     * @param  input   Input <tt>java</tt> file
+     * @param  output  Output <tt>java</tt> file
+     * 
+     * @throws  Throwable  In case something is wrong
+     */
+    public static void process(final String input, final String output) throws Throwable
+    {
+	final String EMPTY = "";
+	final ArrayList<String> lines = new ArrayList<String>();
+	
+	Scanner in = null;
+	try
+	{
+	    in = new Scanner(new BufferedInputStream(new FileInputStream(input)), "UTF-8");
+	    while (in.hasNextLine())
+	    {
+		final String line = in.nextLine();
+		int sep = line.indexOf(" ");
+		int num = Integer.parseInt(line.substring(0, sep)) - 1;
+		while (lines.size() < num)
+		    lines.add(EMPTY);
+		lines.add(line.substring(sep + 1));
+	    }
+	}
+	finally
+	{
+	    if (in != null)
+		try
+		{   in.close();
+		}
+		catch (final Throwable ignore)
+		    { /* ignore */ }
+	}
+	
+        OutputStream out = null;
+	try
+	{
+	    out = new BufferedOutputStream(new FileOutputStream(output));
+	    for (final String line : lines)
+	    {   out.write(line.getBytes("UTF-8"));
+		out.write('\n');
+	    }
+	    out.flush();
+	}
+	finally
+	{
+	    if (out != null)
+		try
+		{   out.close();
+		}
+		catch (final Throwable ignore)
+		    { /* ignore */ }
 	}
     }
     
