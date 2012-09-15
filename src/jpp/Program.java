@@ -238,7 +238,7 @@ public class Program
      * 
      * @throws  Throwable  In case something is wrong
      */
-    public static void process(final String input, final String output) throws Throwable
+    public static void postprocess(final String input, final String output) throws Throwable
     {
 	final String EMPTY = "";
 	final ArrayList<String> lines = new ArrayList<String>();
