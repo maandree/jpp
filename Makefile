@@ -21,6 +21,7 @@ jar: javac
 install: jar
 	mkdir -p "$(DESTDIR)/usr/lib"
 	install -m 644 "jpp.jar" "$(DESTDIR)/usr/lib/"
+	mkdir -p "$(DESTDIR)/usr/bin"
 	echo 'java -jar "/usr/lib/jpp.jar" "$$@"' > "$(DESTDIR)/usr/bin/jpp"
 	chmod 755 "$(DESTDIR)/usr/bin/jpp"
 
