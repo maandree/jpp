@@ -1,1 +1,24 @@
 Bash based preprocessor for Java
+
+
+jpp is simple, at least if you know GNU Bash.
+Add lines beginning with # in your Java files,
+shebangs are ignored, the rest consists of
+directives coded in GNU Bash. An example is
+located in ‘test/’. Files named .jpp will be
+renamed to end with .java.
+
+In addition to # lines, variables can be included
+in a Java code line by placeing the name inside
+double quotes that are in turn in sharp angle
+brackets. Like this: <"VARIABLE">.
+
+Variables are specified when running jpp by -D
+(also known as --export) options, the argument
+should be as if declared in Bash, the code argument
+actually just pasted. Just setting a name in
+the argument is mote and can not be used to
+declare boolean variables as true.
+
+
+TODO  -s --src --source  option is needed
