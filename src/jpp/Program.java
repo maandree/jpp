@@ -102,12 +102,14 @@ public class Program
 		if (_file.toLowerCase().endsWith(".jpp"))
 		    _file = _file.substring(0, _file.length() - 4) + ".java";
 		_file = (new File(oFlag, _file)).getAbsolutePath();
+		(new File(_file)).getParentFile().mkdirs();
 		process(file, _file, vars); /* Do *NOT* use canonical path */
 		postprocess(_file, _file);
 	    }
 	}
 	catch (final Throwable err)
 	{   err(1, "error", null, null, err.toString());
+	    err.printStackTrace(System.err);
 	    System.exit(-2); return;
 	}
     }
@@ -124,14 +126,14 @@ public class Program
      */
     static void err(final int colour, final String type, final String file, final String location, final String description)
     {
-	final String _type        = type        == null ? null : location   .replace("\033", "\033[2m\\033\033[22m");
+	final String _type        = type        == null ? null : type       .replace("\033", "\033[2m\\033\033[22m");
 	final String _file        = file        == null ? null : file       .replace("\033", "\033[2m\\033\033[22m");
 	final String _location    = location    == null ? null : location   .replace("\033", "\033[2m\\033\033[22m");
 	final String _description = description == null ? null : description.replace("\033", "\033[2m\\033\033[22m");
-	final String ucs = "\033[0;1;3" + colour + "mjpp\033[37m:\033[3" + colour + "m" + _type + "\033[37m:\033[21m"
-	                 + (_file == null ? "" : "\033[35m" + _file + "\033[37m:")
-	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[37m:\033[32m") + "\033[37m:")
-	                 + _description.replace(":", "\033[37m:\033[34m") + "\033[0m";
+	final String ucs = "\033[0;1;3" + colour + "mjpp\033[36m:\033[3" + colour + "m" + _type + "\033[36m:\033[21;39m"
+	                 + (_file == null ? "" : "\033[35m" + _file + "\033[36m:\033[39m")
+	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[36m:\033[32m") + "\033[36m:\033[39m")
+	                 + _description.replace(":", "\033[36m:\033[34m") + "\033[0m";
 	final StringBuilder ascii = new StringBuilder();
 	try
 	{   for (final byte b : ucs.getBytes("UTF-8"))
@@ -181,13 +183,18 @@ public class Program
 		try
 		{
 		    lineIndex++;
-		    final String line = in.nextLine();
+		    String line = in.nextLine();
+		    String trim = "";
+		    while (line.startsWith(" ") || line.startsWith("\t"))
+		    {   trim += line.charAt(0);
+			line = line.substring(1);
+		    }
 		    if (line.startsWith("#") && ! line.startsWith("##"))
-			out.write(line.substring(1).getBytes("UTF-8"));
+			out.write((trim + line.substring(line.startsWith("#!") ? 0 : 1)).getBytes("UTF-8"));
 		    else
 		    {
-			String data = line.startsWith("##") ? line.substring(1) : line;
-			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"$(").replace("\">", ")\"'");
+			String data = trim + (line.startsWith("##") ? line.substring(1) : line);
+			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"", "'\"${").replace("\">", "}\"'");
 			data = "echo '" + lineIndex + " " + data + '\'';
 			out.write(data.getBytes("UTF-8"));
 		    }
@@ -197,7 +204,7 @@ public class Program
 		{   err(1, "error", null, null, err.toString());
 		    System.exit(-2); return;
 		}
-	    out.write(("}\npp > '" + output.replace("'", "'\\''") + "'\n").getBytes("UTF-8"));
+	    out.write(("}\n_ > '" + output.replace("'", "'\\''") + "'\n").getBytes("UTF-8"));
 	    out.flush();
 	}
 	finally
@@ -219,7 +226,10 @@ public class Program
         
 	(new File(output)).getParentFile().mkdirs();
 	
-        final ProcessBuilder procBuilder = new ProcessBuilder(("bash ./" + output + ".sh").split("\0"));
+	String exec = output + ".sh";
+	if (exec.contains("/") == false)
+	    exec = "./" + exec;
+        final ProcessBuilder procBuilder = new ProcessBuilder(("bash\0" + exec).split("\0"));
         //procBuilder.inheritIO();
         final Process process = procBuilder.start();
         process.waitFor();
