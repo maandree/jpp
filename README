@@ -12,7 +12,7 @@ In addition to # lines, variables can be included
 in a Java code line by placeing the name inside
 signes dollar inside double quotes that are in turn
 in sharp angle brackets. Like this: <"$VARIABLE$">.
-‘<"">’ is treaded as ‘//’.
+‘<"">’ is treated as ‘//’.
 
 Variables are specified when running jpp by -D
 (also known as --export) options, the argument
