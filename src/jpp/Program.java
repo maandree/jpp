@@ -22,7 +22,7 @@ import java.util.*;
 import java.io.*;
 
 
-/* Compilers and preprocessors SHOULD NEVER use canonical paths. */
+/* Compilers and preprocessors SHOULD NEVER use canonical paths. (except for maybe inclusing guarding) */
 
 
 /**
