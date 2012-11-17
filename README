@@ -10,7 +10,7 @@ renamed to end with .java.
 
 In addition to # lines, variables can be included
 in a Java code line by placeing the name inside
-signes dollar inside double quotes that are in turn
+dollar signes inside double quotes that are in turn
 in sharp angle brackets. Like this: <"$VARIABLE$">.
 ‘<"">’ is treated as ‘//’.
 
