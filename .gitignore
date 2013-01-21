@@ -1,9 +1,11 @@
-/_/
+_/
 
 /bin/
 *.jar
 *.class
 *.pdf
+*.dvi
+*.ps
 *.info
 
 *.gz
@@ -14,3 +16,23 @@
 \#*\#
 .\#*
 *~
+
+
+/dist/*/*/*
+!/dist/*/*/PKGBUILD
+
+/jpp.aux
+/jpp.cp
+/jpp.cps
+/jpp.fn
+/jpp.ky
+/jpp.log
+/jpp.pg
+/jpp.toc
+/jpp.tp
+/jpp.vr
+/jpp.op
+/jpp.ops
+/jpp.pgs
+/jpp.vrs
+

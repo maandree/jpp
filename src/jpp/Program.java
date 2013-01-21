@@ -1,7 +1,7 @@
 /**
  * jpp — Bash based preprocessor for Java
  * 
- * Copyright © 2012  Mattias Andrée (maandree+jpp@kth.se)
+ * Copyright © 2012, 2013  Mattias Andrée (maandree@member.fsf.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import java.io.*;
 /**
  * This is the mane class
  * 
- * @author  Mattias Andrée, <a href="mailto:maandree+jpp@kth.se">maandree+jpp@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@member.fsf.org">maandree@member.fsf.org</a>
  */
 public class Program
 {
