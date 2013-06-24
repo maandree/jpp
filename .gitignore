@@ -18,8 +18,8 @@ _/
 *~
 
 
-/dist/*/*/*
-!/dist/*/*/PKGBUILD
+/dist/*/*
+!/dist/*/PKGBUILD
 
 /jpp.aux
 /jpp.cp
