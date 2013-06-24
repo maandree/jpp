@@ -8,13 +8,27 @@
 # [GNU All Permissive License]
 
 PREFIX=/usr
+BIN=/bin
+DATA=/share
+LICENSES=$(DATA)/licenses
+PKGNAME=jpp
+COMMAND=jpp
+BINJAR=$(DATA)/misc
 
-PROGRAM=jpp
-BOOK=$(PROGRAM)
+BOOK=jpp
 BOOKDIR=info/
 
-all: javac jar info
 
+
+all: code info
+
+code: jpp javac jar
+
+jpp: bin/jpp
+bin/jpp:
+	mkdir -p "./bin/"
+	echo 'java -jar "$(PREFIX)$(BINJAR)/jpp.jar" "$$@"' > "bin/jpp"
+	chmod a+x bin/jpp
 
 javac:
 	mkdir -p "./bin/"
@@ -63,28 +77,32 @@ dvi.xz: $(BOOK).dvi.xz
 	xz -e9 < "$<" > "$@"
 
 
-install:
-	mkdir -p "$(DESTDIR)$(PREFIX)/lib"
-	install -m 644 "jpp.jar" "$(DESTDIR)$(PREFIX)/lib/"
-	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
-	echo 'java -jar "$(PREFIX)/lib/jpp.jar" "$$@"' > "$(DESTDIR)$(PREFIX)/bin/jpp"
-	chmod 755 "$(DESTDIR)$(PREFIX)/bin/jpp"
-	mkdir -p "$(DESTDIR)$(PREFIX)/share/licenses/$(PROGRAM)"
-	mkdir -p "$(DESTDIR)$(PREFIX)/share/info/"
-	install -m 644 COPYING "$(DESTDIR)$(PREFIX)/share/licenses/$(PROGRAM)"
-	install -m 644 LICENSE "$(DESTDIR)$(PREFIX)/share/licenses/$(PROGRAM)"
-	install -m 644 "$(BOOK).info.gz" "$(DESTDIR)$(PREFIX)/share/info"
+install: install-cmd install-license install-info
+
+install-cmd: bin/jpp jpp.jar
+	mkdir -p "$(DESTDIR)$(PREFIX)$(BIN)"
+	mkdir -p "$(DESTDIR)$(PREFIX)$(BINJAR)"
+	install -m 755 "bin/jpp" "$(DESTDIR)$(PREFIX)$(BIN)/$(COMMAND)"
+	install -m 644 "jpp.jar" "$(DESTDIR)$(PREFIX)$(BINJAR)/jpp.jar"
+
+install-license:
+	mkdir -p "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
+	install -m 644 COPYING LICENSE "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)"
+
+install-info: $(BOOK).info.gz
+	mkdir -p "$(DESTDIR)$(PREFIX)$(DATA)/info"
+	install -m 644 "$(BOOK).info.gz" "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
 
 uninstall:
-	unlink "$(DESTDIR)$(PREFIX)/bin/jpp"
-	unlink "$(DESTDIR)$(PREFIX)/lib/jpp.jar"
-	rm -r "$(DESTDIR)$(PREFIX)/share/licenses/$(PROGRAM)"
-	unlink "$(DESTDIR)$(PREFIX)/share/info/$(BOOK).info.gz"
+	-rm "$(DESTDIR)$(PREFIX)$(BIN)/$(COMMAND)"
+	-rm "$(DESTDIR)$(PREFIX)$(BINJAR)/jpp.jar"
+	-rm "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)/COPYING"
+	-rm "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)/LICENSE"
+	-rmdir "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)"
+	-rm "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
 
 clean:
-	[[ -d "./bin" ]] &&      rm -r  "./bin/"
-	[[ -f "./jpp.jar" ]] &&  unlink "./jpp.jar"
-	rm -r *.{t2d,aux,cp,cps,fn,ky,log,pg,pgs,toc,tp,vr,vrs,op,ops,bak,info,pdf,ps,dvi,gz} 2>/dev/null || exit 0
+	-rm -r *.{t2d,aux,cp,cps,fn,ky,log,pg,pgs,toc,tp,vr,vrs,op,ops,bak,info,pdf,ps,dvi,gz} jpp.jar bin 2>/dev/null
 
 .PHONY: clean uninstall install all jar javac
 
