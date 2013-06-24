@@ -11,7 +11,7 @@ PREFIX=/usr
 
 PROGRAM=jpp
 BOOK=$(PROGRAM)
-BOOKDIR=./
+BOOKDIR=info/
 
 all: javac jar info
 
