@@ -95,9 +95,6 @@ public class Program
 	    System.exit(-1); return;
 	}
 	
-	oFlag = absolute(oFlag);
-	sFlag = absolute(sFlag);
-	
 	try
 	{   if ((new File(oFlag)).exists() == false)
 		(new File(oFlag)).mkdirs();
@@ -111,12 +108,17 @@ public class Program
 	}
 	
 	try
-        {   for (final String file : files)
+        {   
+	    if (sFlag.endsWith("/") == false)
+		sFlag += "/";
+	    for (final String file : files)
 	    {
-		String _file = absolute(file).substring(sFlag.length());
+		String _file = file;
+		if (_file.startsWith(sFlag))
+		    _file = _file.substring(sFlag.length());
 		if (_file.toLowerCase().endsWith(".jpp"))
 		    _file = _file.substring(0, _file.length() - 4) + ".java";
-		_file = absolute((new File(oFlag, _file)).getAbsolutePath());
+		_file = oFlag + "/" + _file;
 		(new File(_file)).getParentFile().mkdirs();
 		process(file, _file, vars);
 		postprocess(_file, _file);
@@ -127,39 +129,6 @@ public class Program
 	    err.printStackTrace(System.err);
 	    System.exit(-2); return;
 	}
-    }
-    
-    
-    /**
-     * Gets the nice absolute path
-     * 
-     * @param   file  A path
-     * @return        The absolute path
-     */
-    static String absolute(final String file)
-    {
-	String rc = (new File(file)).getAbsolutePath();
-	
-	while (rc.contains("/./"))
-	    rc = rc.replace("/./", "/");
-	
-	while (rc.startsWith("/../"))
-	    rc = rc.substring(3);
-	
-	while (rc.contains("/../"))
-	{
-	    String prae = rc.substring(0, rc.indexOf("/../"));
-	    String post = rc.substring(rc.indexOf("/../") + 3);
-	    prae = prae.substring(0, rc.lastIndexOf("/"));
-	    rc = prae + post;
-	}
-	
-	if (rc.startsWith("./"))
-	    rc = rc.substring(1);
-	else if (rc.startsWith("../"))
-	    rc = rc.substring(2);
-	
-	return rc;
     }
     
     
