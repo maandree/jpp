@@ -107,7 +107,7 @@ install-cmd: bin/jpp.install
 .PHONY: install-license
 install-license:
 	mkdir -p -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
-	install -m 644 COPYING LICENSE -- "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)"
+	install -m 644 COPYING LICENSE -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
 
 .PHONY: install-info
 install-info: $(BOOK).info.gz
@@ -117,9 +117,9 @@ install-info: $(BOOK).info.gz
 .PHONY: uninstall
 uninstall:
 	-rm -- "$(DESTDIR)$(PREFIX)$(BIN)/$(COMMAND)"
-	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)/COPYING"
-	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)/LICENSE"
-	-rmdir -- "$(DESTDIR)$(PREFIX)$(DATA)$(LICENSES)/$(PKGNAME)"
+	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/COPYING"
+	-rm -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)/LICENSE"
+	-rmdir -- "$(DESTDIR)$(PREFIX)$(LICENSES)/$(PKGNAME)"
 	-rm -- "$(DESTDIR)$(PREFIX)$(DATA)/info/$(PKGNAME).info.gz"
 
 .PHONY: clean
