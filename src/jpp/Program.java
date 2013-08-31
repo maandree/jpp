@@ -193,8 +193,14 @@ public class Program
 	    
 	    out.write("#!/usr/bin/env bash\n".getBytes("UTF-8"));
 	    out.write("function _() {\n".getBytes("UTF-8"));
+	    boolean debug = false;
 	    for (final String var : vars)
-		out.write((var + "\n").getBytes("UTF-8"));
+	    {
+		if (var.contains("="))
+		    out.write((var + "\n").getBytes("UTF-8"));
+		if (var.startsWith("DEBUG=") || var.equals("DEBUG"))
+		    debug = true;
+	    }
 	    int lineIndex = 0;
 	    while (in.hasNextLine())
 		try
@@ -211,7 +217,8 @@ public class Program
 		    else
 		    {
 			String data = trim + (line.startsWith("##") ? line.substring(1) : line);
-			data = data.replace("<\"\">", "//").replace("'", "'\\''").replace("<\"$", "'\"${").replace("$\">", "}\"'");
+			data = data.replace("<\"\">", debug ? "" : "//");
+			data = data.replace("'", "'\\''").replace("<\"$", "'\"${").replace("$\">", "}\"'");
 			data = "echo '" + lineIndex + " " + data + '\'';
 			out.write(data.getBytes("UTF-8"));
 		    }

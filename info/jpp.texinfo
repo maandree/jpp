@@ -80,7 +80,9 @@ In addition to @code{#} lines, variables can be included
 in a Java code line by placing the name inside dollar
 signes inside double quotes that are in turn in sharp
 angle brackets. Like this: @code{<''$VARIABLE$''>}.
-@code{<''>} is treated as @code{//}.
+@code{<''>} is treated as @code{//} in normal mode and
+ignored in debug mode which is active if the varible
+@var{DEBUG} is exported with @option{-D}.
 
 Variables are specified when running @command{jpp} by
 @option{-D} (also known as @option{--export}) options,
