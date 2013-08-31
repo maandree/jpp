@@ -147,10 +147,10 @@ public class Program
 	final String _file        = file        == null ? null : file       .replace("\033", "\033[2m\\033\033[22m");
 	final String _location    = location    == null ? null : location   .replace("\033", "\033[2m\\033\033[22m");
 	final String _description = description == null ? null : description.replace("\033", "\033[2m\\033\033[22m");
-	final String ucs = "\033[0;1;3" + colour + "mjpp\033[36m:\033[3" + colour + "m" + _type + "\033[36m:\033[21;39m"
-	                 + (_file == null ? "" : "\033[35m" + _file + "\033[36m:\033[39m")
-	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[36m:\033[32m") + "\033[36m:\033[39m")
-	                 + _description.replace(":", "\033[36m:\033[34m") + "\033[0m";
+	final String ucs = "\033[00;01;3" + colour + "mjpp\033[36m:\033[3" + colour + "m" + _type + "\033[36m:\033[00m"
+	                 + (_file == null ? "" : "\033[35m" + _file + "\033[36m:\033[00m")
+	                 + (_location == null ? "" : "\033[32m" + _location.replace(":", "\033[36m:\033[32m") + "\033[36m:\033[00m")
+	                 + _description.replace(":", "\033[36m:\033[34m") + "\033[00m";
 	final StringBuilder ascii = new StringBuilder();
 	try
 	{   for (final byte b : ucs.getBytes("UTF-8"))
@@ -158,7 +158,7 @@ public class Program
 		    ascii.append((char)b);
 		else
 		{   byte o = b;
-		    ascii.append("\033[2m\\0");
+		    ascii.append("\033[02m\\0");
 		    while (o != 0)
 		    {   ascii.append((char)('0' | (o & 7)));
 			o >>>= 3;
